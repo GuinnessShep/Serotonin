@@ -1,0 +1,19 @@
+name: Build Serotonin
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          git submodule update --init --recursive
+          sudo xcode-select -s /Applications/Xcode_15.0.app
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/roothide/theos/master/bin/install-theos)"
+          curl -L -o /usr/local/bin/ct_bypass https://cdn.mineek.dev/serotonin/action_deps/ct_bypass && chmod +x /usr/local/bin/ct_bypass
+          brew unlink ldid && brew install ldid-procursus
+          export THEOS=/Users/runner/theos; make
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Serotonin.tipa
+          path: Serotonin.tipa
